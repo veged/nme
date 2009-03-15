@@ -1,0 +1,268 @@
+= Markup of Nyctergatis Markup Engine =
+
+Text with markup is plain text with a few character sequences
+which are recognized by the markup processor and change the format
+of the result. The result is styled text with titles, paragraphs with
+justification, bold and italic faces, etc.
+
+There are two kinds of markup constructs: blocks and inline.
+Blocks are paragraphs (indented or not), headings, list items, table
+cells, horizontal rules and block extensions. Inline constructs are
+character styles, verbatim text and links; they are part of blocks.
+Except in preformatted blocks, sequences of spaces or tabs are
+replaced with single spaces.
+
+== Paragraphs ==
+
+Paragraphs are made of lines whose first character is not one of
+##*#:;=## nor sequence ##~{~{~{##, ##----##,
+or ##~<~<~<##. Lines can begin with sequences ##~*~*##
+and ##~#~###.
+
+Paragraphs end with blank lines or next heading, list, table,
+indented paragraph, preformatted block of text, horizontal rule or
+block extension. They can contain styled text, links, spans of
+verbatim text, and inline extensions.
+
+=== Example ===
+
+{{{
+This is a paragraph
+written in two lines.
+
+This is another paragraph.
+}}}
+
+== Indenting ==
+
+Indented paragraphs are paragraphs which begin with a colon. Multiple
+colons define the level of indenting. Indented paragraphs can contain
+styled text, links, spans of verbatim text, and inline extensions.
+
+=== Example ===
+
+{{{
+This is a normal paragraph.
+:This is an indented
+paragraph in two lines.
+::This is more indented.
+}}}
+
+== Headings ==
+
+Headings are made of a single line beginning with an equal character.
+The number of equal characters defines the
+level of title, from main title (##=##) to sub-sub-subtitle
+(##====##). Headings may end with a sequence of equal
+characters.
+
+=== Examples ===
+
+{{{
+=Level 1 heading=
+Paragraph
+=Another level 1 heading, without trailing equal character
+==Level 2 heading==
+===Level 3 heading===
+}}}
+
+== Lists ==
+
+Lists are collections of items. There are three kinds of lists:
+unnumbered lists, numbered lists, and definition lists. Lists can
+be nested; they end with the next heading, indented paragraph,
+table, or blank line.
+
+Unnumbered lists are represented as indented paragraphs with a
+bullet. Each item begins with a star character (##*##);
+it can span multiple lines.
+
+Numbered lists are represented as indented paragraphs with a
+number. Items are numbered automatically with consecutive integers
+starting at 1. Each item begins with a sharp character (##~###);
+it can span multiple lines.
+
+Definition lists are made of two kinds of items:
+title, typically displayed in bold font, and definition, typically
+displayed indented. Titles begin with a semicolon at the beginning of
+a line. Definitions either follow the title, separated with a colon;
+or they begin on a new line beginning with a colon.
+
+List nesting can combine different kinds of lists. Sublist items
+begin with multiple markers, the first one(s) corresponding to the
+enclosing list(s). For instance, items of an unnumbered list nested
+in a numbered list should start with ##~#*## at the beginning
+of the line, without any preceding space. List markers must be
+used in a consistent way; for example, ##~#~### at the beginning
+of a line in an unnumbered list is not interpreted as a second-level
+numbered list item, but as monospace style (see below).
+
+=== Examples ===
+
+{{{
+* First item of unnumbered list.
+* Second
+item, in two lines.
+*Third item without space (spaces are optional).
+
+# First item of numbered list.
+# Second item.
+#* First item on unnumbered sublist.
+#* Second item.
+# Thirst item of top-level numbered list.
+
+; First title of definition list
+: Definition of first item.
+; Second title: Second definition
+beginning on the same line.
+
+Paragraph separated with a blank line.
+}}}
+
+== Tables ==
+
+Tables are rectangular array of cells. They are made
+of one line per row. Each cell begins with character ##|##.
+Heading cells (typically displayed in bold face) begin with
+##|=##. Rows may end with a trailing ##|##.
+
+=== Example ===
+
+In the table below, the first row and the first column contain
+headings. The very first cell is empty.
+
+{{{
+||=First column|=Second column
+|=First row|Cell 1,1|Cell 1,2
+|=Second row|Cell 2,1|Cell 2,2
+}}}
+
+== Preformatted ==
+
+Preformatted text is a block of text displayed literally, including
+line feeds. Preformatted text is preceded with a line containing
+##~{~{~{## and is followed by a line containing ##}}}##.
+
+=== Example ===
+
+{{{
+This is some C code:
+{{{
+double f(double x)
+{
+  return 2 * x;  // f(x) = 2x
+}
+ }}}
+}}}
+
+In preformatted text, lines which begin with ##}}}##, with leading
+spaces or not, must have an additional space which is discarded in the
+output.
+
+== Horizontal rules ==
+
+Horizontal rules are single lines containing four hyphens.
+
+=== Example ===
+
+{{{
+Paragraph.
+----
+Paragraph following a horizontal rule.
+}}}
+
+== Extensions ==
+
+Sequences ##~<~<## and ##~<~<~<## are reserved for extensions.
+
+== Character style ==
+
+Inside paragraphs, indented paragraphs, headings, list elements,
+and table cells, the following two-character sequences toggle on or
+off the corresponding style. It is not mandatory to nest spans of
+styled characters between matching style sequences. Style is reset
+at the end of text block.
+
+|= Markup  |= Style
+|  ##~**## |  Bold
+|  ##~//## |  Italic
+|  ##~#~###|  Monospace
+|  ##~,,## (two commas) | Subscript
+|  ##~^^## |  Superscript
+|  ##~__## (two underscores) | Underlined
+
+Double stars and double sharps are interpreted as the beginning of
+list items when they are the first characters of a line in the context
+of lists. To be interpreted as style markup, they can be preceded by
+a space.
+
+=== Example ===
+
+{{{
+This is //italic text//, **bold text**,
+and //**bold italic text**//.
+}}}
+
+== Escape character ==
+
+The tilde character, when followed by any character except space, tab or
+line feed, is an escape character; it is not displayed
+and the next character loses its special meaning, if any.
+
+=== Example ===
+
+{{{
+Two stars: ~*~* or ~** or *~*; tilde: ~~.
+}}}
+
+is rendered as "Two stars: ~*~* or ~** or *~*; tilde: ~~."
+
+== Verbatim ==
+
+Verbatim text is a sequence of characters enclosed between
+##~{~{~{## and ##}}}##. After ##~{~{~{##,
+all characters are output verbatim, without any markup interpreting,
+until the next ##}}}## or the end of text block. Multiple
+spaces and tabs and single line feeds are still converted to
+single spaces, though. Verbatim text is an alternative to the
+escape character; it is more convenient for sequences of characters.
+
+=== Example ===
+
+{{{
+{{{**}}} //{{{{{{xx}}}}}}//
+}}}
+
+is rendered as "{{{**}}} //{{{{{{xx}}}}}}//".
+
+== Line break ==
+
+Except in preformatted blocks, line breaks are not preserved.
+The sequence ##~\\## forces a line break.
+
+=== Example ===
+
+{{{
+The next line of this paragraph begins...\\here!
+}}}
+
+== Links ==
+
+Hypertext links (URLs) are enclosed between ##~[[## and
+##]]##. The text displayed as the link is either the
+same as the URL itself if there is no ##|## character,
+or it is what follows ##|##. No markup is recognized in
+the URL part; what follows ##|## can contain styled text
+and verbatim text. Spaces surrounding ##|## are ignored.
+
+=== Examples ===
+
+{{{
+* Simple link: [[http://www.calerga.com]]
+* Link with link text: [[http://www.calerga.com | Calerga]]
+* Link with styled link text: [[http://www.calerga.com | **Calerga**]]
+}}}
+
+----
+Copyright Yves Piguet, 24 October 2007
+May be distributed with NME or cited with proper attribution.
