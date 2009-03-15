@@ -97,6 +97,7 @@ typedef enum NMEStyle
 		// must begin at 0 so that kNMEStylesCount is correct
 	kNMEStyleItalic,	///< italic
 	kNMEStyleUnderline,	///< underline
+	kNMEStyleStrike,	///< strike
 	kNMEStyleSuperscript,	///< superscript
 	kNMEStyleSubscript,	///< subscript
 	kNMEStyleMonospace,	///< monospace (code)
@@ -757,6 +758,7 @@ NMEOutputFormat const NMEOutputFormatText =
 	"", "",	// bold
 	"", "",	// italic
 	"", "",	// underline
+	"", "",	// strike
 	"", "",	// superscript
 	"", "",	// subscript
 	"", "",	// monospace
@@ -805,6 +807,7 @@ NMEOutputFormat const NMEOutputFormatTextCompact =
 	"", "",	// bold
 	"", "",	// italic
 	"", "",	// underline
+	"", "",	// strike
 	"", "",	// superscript
 	"", "",	// subscript
 	"", "",	// monospace
@@ -885,6 +888,7 @@ NMEOutputFormat const NMEOutputFormatNull =
 	"", "",	// bold
 	"", "",	// italic
 	"", "",	// underline
+	"", "",	// strike
 	"", "",	// superscript
 	"", "",	// subscript
 	"", "",	// monospace
@@ -957,6 +961,7 @@ NMEOutputFormat const NMEOutputFormatNME =
 	"**", "**",	// bold
 	"//", "//",	// italic
 	"__", "__",	// underline
+	"--", "--",	// strike
 	"^^", "^^",	// superscript
 	",,", ",,",	// subscript
 	"##", "##",	// monospace
@@ -1012,6 +1017,7 @@ NMEOutputFormat const NMEOutputFormatHTML =
 	"<b>", "</b>",	// bold
 	"<i>", "</i>",	// italic
 	"<u>", "</u>",	// underline
+	"<s>", "</s>",	// strike
 	"<sup>", "</sup>",	// superscript
 	"<sub>", "</sub>",	// subscript
 	"<tt>", "</tt>",	// monospace
@@ -1201,6 +1207,8 @@ NMEOutputFormat const NMEOutputFormatRTF =
 		"}",	// italic
 	"{\\ul ",
 		"}",	// underline
+	"{\\strike ",
+		"}",	// strike
 	"{\\super ",
 		"}",	// superscript
 	"{\\sub ",
@@ -1269,6 +1277,9 @@ NMEOutputFormat const NMEOutputFormatLaTeX =
 		"}",	// italic
 	"\\underline{",
 		"}",	// underline
+	"\\usepackage{ulem}\n"
+	"\\sout{",
+		"}",	// strike
 	"\\textsuperscript{",
 		"}",	// superscript
 	"\\ensuremath{_{\\mbox{",
@@ -1320,6 +1331,7 @@ NMEOutputFormat const NMEOutputFormatMan =
 	"\n.B ", "\n",	// bold
 	"\n.I ", "\n",	// italic
 	"", "",	// underline
+	"", "",	// strike
 	"", "",	// superscript
 	"", "",	// subscript
 	"", "",	// monospace
@@ -1435,6 +1447,8 @@ static NMEConstText styleMarkerFromStyleID(NMEStyle style)
 			return "//";
 		case kNMEStyleUnderline:
 			return "__";
+		case kNMEStyleStrike:
+			return "--";
 		case kNMEStyleSuperscript:
 			return "^^";
 		case kNMEStyleSubscript:
@@ -1520,6 +1534,8 @@ static NMEErr processStyleTag(
 								? outputFormat->endItalic
 							: styleStack[j] == kNMEStyleUnderline
 								? outputFormat->endUnderline
+							: styleStack[j] == kNMEStyleStrike
+								? outputFormat->endStrike
 							: styleStack[j] == kNMEStyleSuperscript
 								? outputFormat->endSuperscript
 							: styleStack[j] == kNMEStyleSubscript
@@ -1552,6 +1568,8 @@ static NMEErr processStyleTag(
 								? outputFormat->beginItalic
 							: styleStack[i] == kNMEStyleUnderline
 								? outputFormat->beginUnderline
+							: styleStack[i] == kNMEStyleStrike
+								? outputFormat->beginStrike
 							: styleStack[i] == kNMEStyleSuperscript
 								? outputFormat->beginSuperscript
 							: styleStack[i] == kNMEStyleSubscript
@@ -1587,6 +1605,7 @@ static NMEErr processStyleTag(
 	if (!NMEAddString(style == kNMEStyleBold ? outputFormat->beginBold
 					: style == kNMEStyleItalic ? outputFormat->beginItalic
 					: style == kNMEStyleUnderline ? outputFormat->beginUnderline
+					: style == kNMEStyleStrike ? outputFormat->beginStrike
 					: style == kNMEStyleSuperscript ? outputFormat->beginSuperscript
 					: style == kNMEStyleSubscript ? outputFormat->beginSubscript
 					: outputFormat->beginCode,
@@ -1648,6 +1667,8 @@ static NMEErr flushStyleTags(
 									? outputFormat->endItalic
 								: styleStack[i] == kNMEStyleUnderline
 									? outputFormat->endUnderline
+								: styleStack[i] == kNMEStyleStrike
+									? outputFormat->endStrike
 								: styleStack[i] == kNMEStyleSuperscript
 									? outputFormat->endSuperscript
 								: styleStack[i] == kNMEStyleSubscript
@@ -2515,17 +2536,39 @@ static NMEBoolean parseNextToken(NMEConstText src, NMEInt srcLen,
 			return TRUE;
 		case '-':
 			// matches regex "^----"
-			if (options & kNMEProcessOptNoHRule
+			if (!(options & kNMEProcessOptNoHRule
 					|| state != kNMEStateBetweenPar && state != kNMEStateParAfterEol
 					|| *i + 3 >= srcLen
 					|| src[*i + 1] != '-' || src[*i + 2] != '-'
-					|| src[*i + 3] != '-')
-				break;	// doesn't match -> plain character
-			// skip all '-'
-			while (*i < srcLen && src[*i] == '-')
-				(*i)++;
-			*token = kNMETokenHR;
-			return TRUE;
+					|| src[*i + 3] != '-')) {
+				// skip all '-'
+				while (*i < srcLen && src[*i] == '-')
+					(*i)++;
+				*token = kNMETokenHR;
+				return TRUE;
+			} else {
+				if (verbatim
+						|| options & kNMEProcessOptNoStrike && src[*i] == '-'
+						|| src[*i + 2] == ' ' && src[*i - 1] == ' ')
+					break;	// plain character, or mdash
+				switch (state)
+				{
+					case kNMEStatePar:
+					case kNMEStateHeading:
+					case kNMEStateBetweenPar:
+					case kNMEStateParAfterEol:
+						if (*i + 1 >= srcLen || src[*i + 1] != src[*i])
+							break;	// not double character -> plain character
+						*token = kNMETokenStyle;
+						*style = kNMEStyleStrike;
+						*i += 2;
+						return TRUE;
+					default:
+						// plain character
+						break;
+				}
+				break;
+			}
 		case '~':
 			// escape character, before any non-blank character
 			if (verbatim

@@ -30,6 +30,7 @@
  *	- //italic//
  *	- __underline__
  *	- ## monospace ##
+ *	- --strike--
  *	- ^^superscript^^
  *	- ,,subscript,,
  *	- {{{verbatim}}}
@@ -202,6 +203,7 @@ enum
 	kNMEProcessOptNoTable = 0x1000,	///< no table
 	kNMEProcessOptNoUnderline = 0x2000,	///< no underline
 	kNMEProcessOptNoMonospace = 0x4000,	///< no monospace
+	kNMEProcessOptNoStrike = 0x6000,	///< no subscript or strike
 	kNMEProcessOptNoSubSuperscript = 0x8000,	///< no subscript or superscript
 	kNMEProcessOptNoBold = 0x10000,	///< no bold
 	kNMEProcessOptNoItalic = 0x20000,	///< no italic
@@ -488,6 +490,8 @@ typedef struct
 	NMEConstText endItalic;	///< end of italic text span
 	NMEConstText beginUnderline;	///< beginning of underline text span
 	NMEConstText endUnderline;	///< end of underline text span
+	NMEConstText beginStrike;	///< beginning of strike text span
+	NMEConstText endStrike;	///< end of strike text span
 	NMEConstText beginSuperscript;	///< beginning of superscript text span
 	NMEConstText endSuperscript;	///< end of superscript text span
 	NMEConstText beginSubscript;	///< beginning of subscript text span

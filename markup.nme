@@ -187,6 +187,7 @@ at the end of text block.
 |  ##~**## |  Bold
 |  ##~//## |  Italic
 |  ##~#~###|  Monospace
+|  ##-~-###|  Strike
 |  ##~,,## (two commas) | Subscript
 |  ##~^^## |  Superscript
 |  ##~__## (two underscores) | Underlined

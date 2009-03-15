@@ -143,6 +143,7 @@ static NMEOutputFormat const NMEOutputFormatSlidesHTML =
 	"<b>", "</b>",	// bold
 	"<i>", "</i>",	// italic
 	"<u>", "</u>",	// underline
+	"<s>", "</s>",	// strike
 	"<sup>", "</sup>",	// superscript
 	"<sub>", "</sub>",	// subscript
 	"<tt>", "</tt>",	// monospace
@@ -192,6 +193,7 @@ static NMEOutputFormat const NMEOutputFormatMediawiki =
 	"'''", "'''",	// bold
 	"''", "''",	// italic
 	"__", "__",	// underline							??
+	"<s>", "</s>",	// strike
 	"<sup>", "</sup>",	// superscript
 	"<sub>", "</sub>",	// subscript
 	"<code>", "</code>",	// monospace
@@ -255,6 +257,7 @@ static NMEOutputFormat const NMEOutputFormatJSPWiki =
 	"__", "__",	// bold
 	"''", "''",	// italic
 	"%%(text-decoration:underline)", "%%",	// underline
+	"%%strike", "%%",	// strike
 	"%%(vertical-align:sup)", "%%",	// superscript
 	"%%(vertical-align:sub)", "%%",	// subscript
 	"{{", "}}",	// monospace
@@ -681,7 +684,7 @@ int main(int argc, char **argv)
 		else if (!strcmp(argv[i], "--headernum2"))
 			options |= kNMEProcessOptH2Num;
 		else if (!strcmp(argv[i], "--strictcreole"))
-			options |= kNMEProcessOptNoUnderline | kNMEProcessOptNoMonospace
+			options |= kNMEProcessOptNoStrike | kNMEProcessOptNoUnderline | kNMEProcessOptNoMonospace
 					| kNMEProcessOptNoSubSuperscript | kNMEProcessOptNoIndentedPar
 					| kNMEProcessOptNoDL | kNMEProcessOptVerbatimMono;
 		else if (!strcmp(argv[i], "--toc"))
@@ -722,7 +725,7 @@ int main(int argc, char **argv)
 					"--mediawiki       MediaWiki output\n"
 					"--nme             NME output\n"
 					"--null            no output (still process input)\n"
-					"--strictcreole    disable monospace, underline, subscript,\n"
+					"--strictcreole    disable monospace, underline, strike, subscript,\n"
 					"                  superscript, definition lists, and indented\n"
 					"                  paragraphs; and enable nowiki monospace\n"
 					"--structdiv       display division structure\n"
